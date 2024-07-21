@@ -1,0 +1,7 @@
+[general]
+name=ArgentinaGeoServices
+description=A QGIS plugin to import WMS Geoservices from Argentina
+version=1.0
+qgisMinimumVersion=3.0
+author=Thomas Artopoulos
+email=thomas.artopoulos@gmail.com
