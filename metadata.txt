@@ -1,7 +1,11 @@
 [general]
 name=ArgentinaGeoServices
 description=A QGIS plugin to import WMS Geoservices from Argentina
+about= WMS shortcut for Argentinian layers
 version=1.0
 qgisMinimumVersion=3.0
 author=Thomas Artopoulos
 email=thomas.artopoulos@gmail.com
+tracker=https://github.com/thomasartopoulos/ba_converter-qgis-plugin/issues
+repository=https://github.com/thomasartopoulos/ba_converter-qgis-plugin
+homepage=https://github.com/thomasartopoulos/ba_converter-qgis-plugin
