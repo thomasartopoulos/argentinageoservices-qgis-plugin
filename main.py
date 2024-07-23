@@ -37,6 +37,7 @@ class QGISWebScraper:
             self.ui = Ui_QGISWebScraperDialogBase()
             self.ui.setupUi(self.dialog)
             self.ui.importButton.clicked.connect(self.show_wms_layers)
+            self.dialog.setWindowIcon(QIcon(os.path.join(self.plugin_dir, 'resources/sol_de_mayo.png')))
 
         self.layer_data = self.scrape_web_page()
         if self.layer_data is not None:
@@ -96,6 +97,13 @@ class QGISWebScraper:
     def show_wms_layers(self):
         if self.layer_data is None:
             QMessageBox.warning(None, "Error", "No data available.")
+            return
+
+        # Check if there are any WMS layers available
+        wms_layers_available = any(self.layer_data['WMS'].notna())
+
+        if not wms_layers_available:
+            QMessageBox.warning(None, "Error", "No WMS layers available.")
             return
 
         selected_items = [item for item in [self.ui.wmsTreeWidget.topLevelItem(i)

@@ -12,7 +12,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_QGISWebScraperDialogBase(object):
     def setupUi(self, QGISWebScraperDialogBase):
         QGISWebScraperDialogBase.setObjectName("QGISWebScraperDialogBase")
-        QGISWebScraperDialogBase.resize(400, 300)
+        QGISWebScraperDialogBase.resize(600, 500)
         
         # Set window icon here
         QGISWebScraperDialogBase.setWindowIcon(QtGui.QIcon('resources/sol_de_mayo.png'))

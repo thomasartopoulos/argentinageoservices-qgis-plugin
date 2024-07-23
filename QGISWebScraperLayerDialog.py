@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtWidgets
 class Ui_QGISWebScraperLayerDialog(object):
     def setupUi(self, QGISWebScraperLayerDialog):
         QGISWebScraperLayerDialog.setObjectName("QGISWebScraperLayerDialog")
-        QGISWebScraperLayerDialog.resize(400, 300)
+        QGISWebScraperLayerDialog.resize(600, 500)
         self.verticalLayout = QtWidgets.QVBoxLayout(QGISWebScraperLayerDialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.layerTreeWidget = QtWidgets.QTreeWidget(QGISWebScraperLayerDialog)
