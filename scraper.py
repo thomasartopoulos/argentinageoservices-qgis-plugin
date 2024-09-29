@@ -1,44 +1,32 @@
 import requests
 import pandas as pd
 import io
-import re
+import logging
+from .wms_utils import clean_url
+from .wms_checker import check_wms_availability
 
-def clean_url(url):
-    if pd.isna(url):
-        return url
-    url = re.sub(r'\[WMS\]', '', url)
-    url = url.replace('(', '').replace(')', '')
-    return url.strip()
+logger = logging.getLogger(__name__)
 
 def parse_csv(content, url):
     try:
+        logger.debug(f"Parsing CSV from URL: {url}")
+        logger.debug(f"CSV content preview: {content[:200]}...")  # Log the first 200 characters of the CSV
+
         if "JJpjQ" in url:  # Special handling for Organismos Provinciales
             df = pd.read_csv(io.StringIO(content), sep='\t', encoding='utf-8', dtype=str)
-            # Keep only the first three columns
             df = df.iloc[:, :3]
-            # Rename columns to match expected structure
             df.columns = ['Provincia', 'Organismo', 'WMS']
         else:
             df = pd.read_csv(io.StringIO(content), sep='\t', encoding='utf-8', dtype=str)
         
-        # Ensure we only keep the first three columns for all datasets
         df = df.iloc[:, :3]
-        
+        logger.debug(f"Parsed DataFrame shape: {df.shape}")
+        logger.debug(f"Parsed DataFrame columns: {df.columns}")
+        logger.debug(f"First few rows of parsed DataFrame:\n{df.head()}")
         return df
     except Exception as e:
-        print(f"Error parsing CSV: {str(e)}")
+        logger.exception(f"Error parsing CSV from {url}: {str(e)}")
         return None
-
-def check_wms_availability(url):
-    try:
-        get_capabilities_url = f"{url}?SERVICE=WMS&REQUEST=GetCapabilities"
-        response = requests.get(get_capabilities_url, timeout=10)
-        if response.status_code == 200:
-            return "Available"
-        else:
-            return "Not Available"
-    except requests.exceptions.RequestException:
-        return "Not Available"
 
 def scrape_web_page():
     urls = [
@@ -62,35 +50,29 @@ def scrape_web_page():
 
     for i, url in enumerate(urls):
         try:
+            logger.info(f"Fetching data from URL: {url}")
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             csv_content = response.content.decode('utf-8')
             
+            logger.debug(f"Response status code: {response.status_code}")
+            logger.debug(f"Response content preview: {csv_content[:200]}...")  # Log the first 200 characters
+            
             df = parse_csv(csv_content, url)
-            if df is not None:
+            if df is not None and not df.empty:
                 if 'WMS' in df.columns:
                     df['WMS'] = df['WMS'].apply(clean_url)
-                    df['Status'] = df['WMS'].apply(check_wms_availability)
+                    df['Status'] = 'Unchecked'  # Initialize status as unchecked
                 data[i] = df
                 
-                print(f"Successfully processed {url}")
-                print(f"DataFrame shape: {df.shape}")
-                print(f"DataFrame columns: {df.columns}")
+                logger.info(f"Successfully processed {url}")
+                logger.info(f"DataFrame shape: {df.shape}")
+                logger.info(f"DataFrame columns: {df.columns}")
             else:
-                print(f"Failed to process {url}")
+                logger.warning(f"Failed to process {url} or DataFrame is empty")
         except Exception as e:
-            print(f"Error processing {url}: {str(e)}")
+            logger.exception(f"Error processing {url}: {str(e)}")
             data[i] = None
 
+    logger.info(f"Total datasets processed: {len(data)}")
     return data
-
-# Test the function
-if __name__ == "__main__":
-    data = scrape_web_page()
-    for i, df in data.items():
-        if df is not None:
-            print(f"Data for URL {i}:")
-            print(df.head())
-            print("\n")
-        else:
-            print(f"No data available for URL {i}\n")
